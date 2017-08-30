@@ -16,14 +16,15 @@ namespace PotterShoppingCart.Tests
             {
                 new Book("Harry Potter Episode 1",100,1)
             };
-            var discountrule =
-                new DiscountRule() { Discount = 0.95, DifferentItemNumber = 2 };
+            var discountrules = new List<DiscountRule>
+            {
+                new DiscountRule() {Discount = 1, DifferentItemNumber = 1}
+            };
             double expected = 100;
             //var actual = pottershoppingcart.GetSum(book => book.Price);
-            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrules, sumBy => sumBy.Price, groupby => groupby.Name);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
-
         [TestMethod]
         public void PotterShoppingCart價格計算測試_第一集買一本_第二集買一本_滿足95折優惠_價格為190()
         {
@@ -32,11 +33,13 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 1",100,1),
                 new Book("Harry Potter Episode 2",100,1)
             };
-            var discountrule =
-                new DiscountRule() { Discount = 0.95, DifferentItemNumber = 2 };
+            var discountrules = new List<DiscountRule>
+            {
+                new DiscountRule() {Discount = 0.95, DifferentItemNumber = 2}
+            };
 
             double expected = 190;
-            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrules, sumBy => sumBy.Price, groupby => groupby.Name);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
         [TestMethod]
@@ -48,11 +51,13 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 2",100,1),
                 new Book("Harry Potter Episode 3",100,1)
             };
-            var discountrule =
-                new DiscountRule() { Discount = 0.9, DifferentItemNumber = 3 };
+            var discountrules = new List<DiscountRule>
+            {
+                new DiscountRule() {Discount = 0.9, DifferentItemNumber = 3}
+            };
 
             double expected = 270;
-            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrules, sumBy => sumBy.Price, groupby => groupby.Name);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
         [TestMethod]
@@ -65,11 +70,13 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 3",100,1),
                 new Book("Harry Potter Episode 4",100,1)
             };
-            var discountrule =
-                new DiscountRule() { Discount = 0.8, DifferentItemNumber = 4 };
+            var discountrules = new List<DiscountRule>
+            {
+                new DiscountRule() {Discount = 0.8, DifferentItemNumber = 4}
+            };
 
             double expected = 320;
-            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrules, sumBy => sumBy.Price, groupby => groupby.Name);
             expected.ToExpectedObject().ShouldEqual(actual);
             //Assert.Fail("尚未實作");
         }
@@ -84,11 +91,13 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 4",100,1),
                 new Book("Harry Potter Episode 5",100,1)
             };
-            var discountrule =
-                new DiscountRule() { Discount = 0.75, DifferentItemNumber = 5 };
+            var discountrules = new List<DiscountRule>
+            {
+                new DiscountRule() {Discount = 0.75, DifferentItemNumber = 5}
+            };
 
             double expected = 375;
-            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrules, sumBy => sumBy.Price, groupby => groupby.Name);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
         [TestMethod]
@@ -101,13 +110,35 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 3",100,1),
                 new Book("Harry Potter Episode 3",100,1)
             };
-            var discountrule =
-                new DiscountRule() { Discount = 0.9, DifferentItemNumber = 3 };
+            var discountrules = new List<DiscountRule>
+            {
+                new DiscountRule() {Discount = 0.9, DifferentItemNumber = 3}
+            };
 
             double expected = 370;
-            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrules, sumBy => sumBy.Price, groupby => groupby.Name);
             expected.ToExpectedObject().ShouldEqual(actual);
-            //Assert.Fail("尚未實作");
+        }
+        [TestMethod]
+        public void PotterShoppingCart價格計算測試_第一集買一本_第二三集各買兩本_其中三本滿足9折兩本滿足95折優惠_價格為460()
+        {
+            var pottershoppingcart = new List<Book>
+            {
+                new Book("Harry Potter Episode 1",100,1),
+                new Book("Harry Potter Episode 2",100,1),
+                new Book("Harry Potter Episode 2",100,1),
+                new Book("Harry Potter Episode 3",100,1),
+                new Book("Harry Potter Episode 3",100,1)
+            };
+            var discountrules = new List<DiscountRule>
+            {
+                //第一個DiscountRule  > 第二個DiscountRule...依序優先套用
+                new DiscountRule() {Discount = 0.9, DifferentItemNumber = 3},
+                new DiscountRule() {Discount = 0.95, DifferentItemNumber = 2}
+            };
+            double expected = 460;
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrules, sumBy => sumBy.Price, groupby => groupby.Name);
+            expected.ToExpectedObject().ShouldEqual(actual);
         }
 
     }

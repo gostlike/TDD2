@@ -1,9 +1,8 @@
-﻿using System;
+﻿using ShoppingCartLibrary.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Reflection;
-using ShoppingCartLibrary.Models;
 
 namespace ShoppingCartLibrary
 {
@@ -17,39 +16,41 @@ namespace ShoppingCartLibrary
         /// <param name="selector"></param>
         /// <returns></returns>
         public static double GetSum<T>(
-            this IEnumerable<T> shoppingList,Func<T, double> selector)
+            this IEnumerable<T> shoppingList, Func<T, double> selector)
         {
             return shoppingList.Sum(selector);
         }
-
         /// <summary>
-        /// 計算折扣後的總價格
+        ///計算折扣後的總價格
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="shoppings">購買清單</param>
-        /// <param name="discountRule">折扣規則</param>
+        /// <param name="discountRules">折扣規則集合</param>
         /// <param name="priceSelector">購買物品的價格屬性</param>
         /// <param name="groupBySelector">對購買物品分群的屬性</param>
         /// <returns></returns>
         public static double GetDiscountSum<T>(
-            this IEnumerable<T> shoppings, DiscountRule discountRule ,Func<T, double> priceSelector,
-            Func<T,string> groupBySelector)
+            this IEnumerable<T> shoppings, IEnumerable<DiscountRule> discountRules, Func<T, double> priceSelector,
+            Func<T, string> groupBySelector)
         {
             var resultList = new List<T>();
             var shoppingsList = shoppings.ToList();
-            while (shoppingsList.GroupBy(groupBySelector).Count()>= discountRule.DifferentItemNumber)
+            foreach (var rule in discountRules)
             {
-               var diffList = shoppingsList.GroupBy(groupBySelector).SelectMany(g => g.Take(1)).Take(discountRule.DifferentItemNumber);
-               if (diffList.Count() >= discountRule.DifferentItemNumber)
-               {   
-                    foreach (var item in diffList)
+                while (shoppingsList.GroupBy(groupBySelector).Count() >= rule.DifferentItemNumber)
+                {
+                    var diffList = shoppingsList.GroupBy(groupBySelector).SelectMany(g => g.Take(1)).Take(rule.DifferentItemNumber);
+                    if (diffList.Count() >= rule.DifferentItemNumber)
                     {
-                        PropertyInfo propertyInfo = item.GetType().GetProperty("Discount");
-                        propertyInfo.SetValue(item, Convert.ChangeType(discountRule.Discount, propertyInfo.PropertyType),null);
-                        resultList.Add(item);
-                        shoppingsList.Remove(item);
+                        foreach (var item in diffList)
+                        {
+                            PropertyInfo propertyInfo = item.GetType().GetProperty("Discount");
+                            propertyInfo.SetValue(item, Convert.ChangeType(rule.Discount, propertyInfo.PropertyType), null);
+                            resultList.Add(item);
+                            shoppingsList.Remove(item);
+                        }
                     }
-               }
+                }
             }
             return resultList.Concat(shoppingsList).Sum(priceSelector);
         }
