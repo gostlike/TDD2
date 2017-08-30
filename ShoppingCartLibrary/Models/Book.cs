@@ -1,15 +1,18 @@
-﻿namespace ShoppingCartLibrary.Models
+﻿using System;
+
+namespace ShoppingCartLibrary.Models
 {
     public class Book
     {
         public string Name { get;}
-
-        public int Price { get;}
-
-        public Book(string name,int price)
+        public double Price => OriginPrice * Discount;
+        public double OriginPrice { get; }
+        public double Discount { get; set; }
+        public Book(string name,int originprice, double discount)
         {
             Name = name;
-            Price = price;
+            OriginPrice = originprice;
+            Discount = discount;
         }
     }
 }
