@@ -16,15 +16,29 @@ namespace PotterShoppingCart.Tests
             {
                 new Book("Harry Potter Episode 1",100,1)
             };
+            var discountrule =
+                new DiscountRule() { Discount = 0.95, DifferentItemNumber = 2 };
             double expected = 100;
-            var actual = pottershoppingcart.GetSum(book => book.Price);
+            //var actual = pottershoppingcart.GetSum(book => book.Price);
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
         [TestMethod]
         public void PotterShoppingCart價格計算測試_第一集買一本_第二集買一本_滿足95折優惠_價格為190()
         {
-           Assert.Fail("尚未實作");
+            var pottershoppingcart = new List<Book>
+            {
+                new Book("Harry Potter Episode 1",100,1),
+                new Book("Harry Potter Episode 2",100,1)
+            };
+            var discountrule =
+                new DiscountRule() { Discount = 0.95, DifferentItemNumber = 2 };
+
+            double expected = 190;
+            var actual = pottershoppingcart.GetDiscountSum<Book>(discountrule, sumBy => sumBy.Price, groupby => groupby.Name);
+            expected.ToExpectedObject().ShouldEqual(actual);
+            //Assert.Fail("尚未實作");
         }
     }
 }
