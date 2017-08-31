@@ -20,21 +20,22 @@ namespace ShoppingCartLibrary
         {
             return shoppingList.Sum(selector);
         }
-        /// <summary>
-        ///計算折扣後的總價格
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="shoppings">購買清單</param>
-        /// <param name="discountRules">折扣規則集合</param>
-        /// <param name="priceSelector">購買物品的價格屬性</param>
-        /// <param name="groupBySelector">對購買物品分群的屬性</param>
+
+        ///  <summary>
+        /// 計算商品在折扣後的總價格
+        ///  </summary>
+        ///  <typeparam name="T"></typeparam>
+        ///  <param name="shoppings">購買清單</param>
+        ///  <param name="discountRules">折扣規則集合</param>
+        ///  <param name="priceSelector">購買物品的價格屬性</param>
+        ///  <param name="groupBySelector">對購買物品分群的屬性</param>
         /// <returns></returns>
-        public static double GetDiscountSum<T>(
-            this IEnumerable<T> shoppings, IEnumerable<DiscountRule> discountRules, Func<T, double> priceSelector,
-            Func<T, string> groupBySelector)
+        public static double GetPrice<T>(
+            this IEnumerable<T> shoppings, IEnumerable<DiscountRule> discountRules, Func<T, double> priceSelector, Func<T, string> groupBySelector)
         {
             var resultList = new List<T>();
             var shoppingsList = shoppings.ToList();
+
             foreach (var rule in discountRules)
             {
                 while (shoppingsList.GroupBy(groupBySelector).Count() >= rule.DifferentItemNumber)
@@ -44,8 +45,8 @@ namespace ShoppingCartLibrary
                     {
                         foreach (var item in diffList)
                         {
-                            PropertyInfo propertyInfo = item.GetType().GetProperty("Discount");
-                            propertyInfo.SetValue(item, Convert.ChangeType(rule.Discount, propertyInfo.PropertyType), null);
+                            PropertyInfo discountProperty = item.GetType().GetProperty("Discount");
+                            discountProperty.SetValue(item, Convert.ChangeType(rule.Discount, discountProperty.PropertyType), null);
                             resultList.Add(item);
                             shoppingsList.Remove(item);
                         }
@@ -53,6 +54,22 @@ namespace ShoppingCartLibrary
                 }
             }
             return resultList.Concat(shoppingsList).Sum(priceSelector);
+        }
+
+        /// <summary>
+        /// 計算書本最優惠價格
+        /// </summary>
+        /// <param name="shoppings"></param>
+        /// <param name="discountRules"></param>
+        /// <returns></returns>
+        public static double GetBestPrice(this IEnumerable<Book> shoppings, IEnumerable<DiscountRule> discountRules)
+        {
+            var bestprice = new List<double>();
+            for (var item = 0; item < shoppings.Count(); item++)
+            {
+                bestprice.Add(GetPrice<Book>(shoppings, discountRules.Skip(item), x => x.Price, x => x.Name));
+            }
+            return bestprice.Min();
         }
     }
 }
