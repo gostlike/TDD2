@@ -9,9 +9,9 @@ namespace PotterShoppingCart.Tests
     [TestClass]
     public class UnitTest1
     {
-        private List<DiscountRule> discountRules = new List<DiscountRule>
+        private readonly List<DiscountRule> discountRules = new List<DiscountRule>
         {
-            //按折扣高依序排列，高的優先套用，第一個DiscountRule  > 第二個DiscountRule...
+            //按折扣高依序排列，index低的優先套用，index 0>1>2 ...
             new DiscountRule() {Discount = 0.75, DifferentItemNumber = 5},
             new DiscountRule() {Discount = 0.8, DifferentItemNumber = 4},
             new DiscountRule() {Discount = 0.9, DifferentItemNumber = 3},
@@ -26,7 +26,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 1",100,1)
             };
             double expected = 100;
-            var actual = pottershoppingcart.GetPrice<Book>(discountRules, sumBy => sumBy.Price, groupBy => groupBy.Name);
+            var actual = pottershoppingcart.GetBookPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -39,7 +39,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 2",100,1)
             };
             double expected = 190;
-            var actual = pottershoppingcart.GetPrice<Book>(discountRules, sumBy => sumBy.Price, groupBy => groupBy.Name);
+            var actual = pottershoppingcart.GetBookPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -54,7 +54,7 @@ namespace PotterShoppingCart.Tests
             };
 
             double expected = 270;
-            var actual = pottershoppingcart.GetPrice<Book>(discountRules, sumBy => sumBy.Price, groupBy => groupBy.Name);
+            var actual = pottershoppingcart.GetBookPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -69,7 +69,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 4",100,1)
             };
             double expected = 320;
-            var actual = pottershoppingcart.GetPrice<Book>(discountRules, sumBy => sumBy.Price, groupBy => groupBy.Name);
+            var actual = pottershoppingcart.GetBookPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
             //Assert.Fail("尚未實作");
         }
@@ -86,7 +86,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 5",100,1)
             };
             double expected = 375;
-            var actual = pottershoppingcart.GetPrice<Book>(discountRules, sumBy => sumBy.Price, groupBy => groupBy.Name);
+            var actual = pottershoppingcart.GetBookPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -101,7 +101,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 3",100,1)
             };
             double expected = 370;
-            var actual = pottershoppingcart.GetPrice<Book>(discountRules, sumBy => sumBy.Price, groupBy => groupBy.Name);
+            var actual = pottershoppingcart.GetBookPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -117,7 +117,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 3",100,1)
             };
             double expected = 460;
-            var actual = pottershoppingcart.GetPrice<Book>(discountRules, sumBy => sumBy.Price, groupBy => groupBy.Name);
+            var actual = pottershoppingcart.GetBookPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -136,7 +136,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 5",100,1)
             };
             double expected = 640;
-            var actual = pottershoppingcart.GetBestPrice(discountRules);
+            var actual = pottershoppingcart.GetBookBestPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -156,7 +156,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 5",100,1)
             };
             double expected = 695;
-            var actual = pottershoppingcart.GetBestPrice(discountRules);
+            var actual = pottershoppingcart.GetBookBestPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
 
@@ -183,7 +183,7 @@ namespace PotterShoppingCart.Tests
                 new Book("Harry Potter Episode 5",100,1)
             };
             double expected = 1280;
-            var actual = pottershoppingcart.GetBestPrice(discountRules);
+            var actual = pottershoppingcart.GetBookBestPrice(discountRules);
             expected.ToExpectedObject().ShouldEqual(actual);
         }
     }
